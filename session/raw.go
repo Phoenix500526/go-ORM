@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"goorm/clause"
 	"goorm/dialect"
 	"goorm/log"
 	"goorm/schema"
@@ -14,6 +15,7 @@ type Session struct {
 	db       *sql.DB
 	dialect  dialect.Dialect
 	refTable *schema.Schema
+	clause   clause.Clause
 	sql      strings.Builder
 	sqlVars  []interface{}
 }
@@ -33,6 +35,7 @@ func (s *Session) DB() *sql.DB {
 func (s *Session) Clear() {
 	s.sql.Reset()
 	s.sqlVars = nil
+	s.clause = clause.Clause{}
 }
 
 // Exec raw sql with sqlVars
