@@ -2,6 +2,7 @@ package goorm
 
 import (
 	"database/sql"
+	"goorm/dialect"
 	"goorm/log"
 	"goorm/session"
 )
@@ -10,7 +11,8 @@ import (
 // say connecting and testing DB before interaction and closing DB
 // after interaction.
 type Engine struct {
-	db *sql.DB
+	db      *sql.DB
+	dialect dialect.Dialect
 }
 
 func NewEngine(driver, source string) (e *Engine, err error) {
@@ -26,7 +28,14 @@ func NewEngine(driver, source string) (e *Engine, err error) {
 		return
 	}
 
-	e = &Engine{db: db}
+	// To ensure that the specific dialect exists
+	dial, ok := dialect.GetDialect(driver)
+	if !ok {
+		log.Errorf("dialect %s Not Found", driver)
+		return
+	}
+
+	e = &Engine{db: db, dialect: dial}
 	log.Info("Connect database success")
 	return
 }
@@ -39,5 +48,5 @@ func (e *Engine) Close() {
 }
 
 func (e *Engine) NewSession() *session.Session {
-	return session.NewSession(e.db)
+	return session.NewSession(e.db, e.dialect)
 }

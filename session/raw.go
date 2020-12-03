@@ -2,21 +2,28 @@ package session
 
 import (
 	"database/sql"
+	"goorm/dialect"
 	"goorm/log"
+	"goorm/schema"
 	"strings"
 )
 
 // Session keep a pointer to sql.DB and provides all execution of all
 // kind of database operations.
 type Session struct {
-	db      *sql.DB
-	sql     strings.Builder
-	sqlVars []interface{}
+	db       *sql.DB
+	dialect  dialect.Dialect
+	refTable *schema.Schema
+	sql      strings.Builder
+	sqlVars  []interface{}
 }
 
 // Session Factory
-func NewSession(db *sql.DB) *Session {
-	return &Session{db: db}
+func NewSession(db *sql.DB, dialect dialect.Dialect) *Session {
+	return &Session{
+		db:      db,
+		dialect: dialect,
+	}
 }
 
 func (s *Session) DB() *sql.DB {

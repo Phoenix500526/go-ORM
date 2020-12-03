@@ -3,11 +3,15 @@ package session
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"goorm/dialect"
 	"os"
 	"testing"
 )
 
-var TestDB *sql.DB
+var (
+	TestDB      *sql.DB
+	TestDial, _ = dialect.GetDialect("sqlite3")
+)
 
 func TestMain(m *testing.M) {
 	TestDB, _ = sql.Open("sqlite3", "../goo.db")
@@ -17,7 +21,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestSession_Exec(t *testing.T) {
-	s := NewSession(TestDB)
+	s := NewSession(TestDB, TestDial)
 	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
 	_, _ = s.Raw("CREATE TABLE User(Name text);").Exec()
 	result, _ := s.Raw("INSERT INTO User(`Name`) values (?), (?)", "Tom", "Sam").Exec()
@@ -27,7 +31,7 @@ func TestSession_Exec(t *testing.T) {
 }
 
 func TestSession_QueryRows(t *testing.T) {
-	s := NewSession(TestDB)
+	s := NewSession(TestDB, TestDial)
 	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
 	_, _ = s.Raw("CREATE TABLE User(Name text);").Exec()
 	row := s.Raw("SELECT count(*) FROM User").QueryRow()
