@@ -33,8 +33,3 @@ func TestSchema_RecordValues(t *testing.T) {
 		t.Fatal("failed to get values")
 	}
 }
-
-type UserTest struct {
-	Name string `goorm:"PRIMARY KEY"`
-	Age  int
-}
